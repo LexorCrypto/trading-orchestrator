@@ -1,0 +1,89 @@
+version: "3.9"
+
+# Виртуальный офис трейдера — полный Docker Compose стек
+# Запуск:  docker compose up -d
+# Разработка:  docker compose up orchestrator --build
+
+services:
+
+  # ── Whisper STT (существующий сервис) ────────────────────────────
+  whisper-api:
+    build:
+      context: ../Whisper bot
+    container_name: whisper-api
+    restart: unless-stopped
+    env_file: ../Whisper bot/.env
+    ports:
+      - "8001:8001"
+    volumes:
+      - whisper_models:/root/.cache/whisper
+      - ../Whisper bot/tmp:/app/tmp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - trader-net
+
+  # ── Main Orchestrator ─────────────────────────────────────────────
+  orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: orchestrator
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8002:8002"
+    depends_on:
+      redis:
+        condition: service_healthy
+      whisper-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - trader-net
+
+  # ── Redis (short-term memory / conversation context) ──────────────
+  redis:
+    image: redis:7-alpine
+    container_name: trader-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - trader-net
+
+  # ── ChromaDB (long-term vector memory) ───────────────────────────
+  # Фаза 4: раскомментировать
+  # chroma:
+  #   image: chromadb/chroma:latest
+  #   container_name: trader-chroma
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - chroma_data:/chroma/.chroma
+  #   networks:
+  #     - trader-net
+
+networks:
+  trader-net:
+    driver: bridge
+
+volumes:
+  whisper_models:
+  # chroma_data:
