@@ -35,7 +35,7 @@ _PAGE_LIMIT = 150
 # ── Internal helpers ──────────────────────────────────────────────────
 
 def _client() -> httpx.AsyncClient:
-    return httpx.AsyncClient(verify=False, timeout=30, follow_redirects=True)
+    return httpx.AsyncClient(timeout=30, follow_redirects=True)
 
 
 def _period_ts(duration: str) -> int:

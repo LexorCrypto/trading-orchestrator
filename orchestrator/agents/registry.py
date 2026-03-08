@@ -141,6 +141,54 @@ AGENT_TOOLS: list[dict] = [
         },
     },
     {
+        "name": "market_scanner",
+        "description": (
+            "Сканирует рынок Bybit USDT Perpetual для скальпинга. "
+            "Возвращает список тикеров с метриками: объём, дневной диапазон, "
+            "NATR на 5m, движение за 5 минут. "
+            "Вызывай при фразах: 'подбери монеты для скальпа', "
+            "'топ активов Bybit по волатильности', 'что движется на Bybit', "
+            "'лучшие пары для скальпинга', 'покажи активные инструменты Bybit'. "
+            "Всегда используй action='bybit_scan'."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": ["bybit_scan"],
+                    "description": "Всегда 'bybit_scan'.",
+                },
+                "exchange": {
+                    "type": "string",
+                    "enum": ["bybit"],
+                    "description": "Биржа (сейчас только bybit).",
+                },
+                "min_quote_volume_24h": {
+                    "type": "number",
+                    "description": "Мин. 24h оборот в USDT. По умолч. 50 000 000.",
+                },
+                "min_range_24h_pct": {
+                    "type": "number",
+                    "description": "Мин. дневной диапазон (high-low)/low*100 в %. По умолч. 5.0.",
+                },
+                "min_move_5m_pct": {
+                    "type": "number",
+                    "description": "Мин. |движение за 5 минут| в %. По умолч. 0.5. Передай 0 чтобы не фильтровать.",
+                },
+                "natr_period": {
+                    "type": "integer",
+                    "description": "Период ATR для NATR. По умолч. 14.",
+                },
+                "top_n": {
+                    "type": "integer",
+                    "description": "Кол-во тикеров в ответе. По умолч. 10.",
+                },
+            },
+            "required": ["action"],
+        },
+    },
+    {
         "name": "research_agent",
         "description": (
             "Исследует on-chain данные, DeFi протоколы, выполняет web-поиск, "
@@ -171,6 +219,7 @@ async def route_tool_call(name: str, input_data: dict[str, Any]) -> dict[str, An
         "news_monitor": _news_monitor,
         "trade_manager": _trade_manager,
         "risk_guardian": _risk_guardian,
+        "market_scanner": _market_scanner,
         "research_agent": _research_agent,
     }
     handler = handlers.get(name)
@@ -316,6 +365,24 @@ async def _risk_guardian(inp: dict) -> dict:
             "source": "Risk Guardian calc",
         }
     return {"action": action, "data": {}}
+
+
+async def _market_scanner(inp: dict) -> dict:
+    """Market Scanner — Bybit USDT Perpetual для скальпинга."""
+    from orchestrator.agents.market_scanner_bybit import scan_bybit_market
+
+    action = inp.get("action", "bybit_scan")
+
+    if action == "bybit_scan":
+        return await scan_bybit_market(
+            min_quote_volume_24h=float(inp.get("min_quote_volume_24h", 50_000_000)),
+            min_range_24h_pct=float(inp.get("min_range_24h_pct", 5.0)),
+            min_move_5m_pct=float(inp.get("min_move_5m_pct", 0.5)),
+            natr_period=int(inp.get("natr_period", 14)),
+            top_n=int(inp.get("top_n", 10)),
+        )
+
+    return {"error": f"Unknown market_scanner action: {action}"}
 
 
 async def _research_agent(inp: dict) -> dict:

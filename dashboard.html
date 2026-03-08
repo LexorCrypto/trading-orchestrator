@@ -350,6 +350,33 @@
     .news-tag.bull { background: rgba(34,197,94,0.1); color: var(--accent-2); border-color: rgba(34,197,94,0.2); }
     .news-tag.bear { background: rgba(248,113,113,0.1); color: var(--accent-danger); border-color: rgba(248,113,113,0.2); }
 
+    /* ── Scanner widget ──────────────────── */
+    .scanner-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    .scanner-table th {
+      color: var(--muted-2); font-weight: 500; text-align: left;
+      padding: 3px 4px 6px; border-bottom: 1px solid var(--border);
+      font-size: 0.62rem; letter-spacing: 0.07em; text-transform: uppercase;
+    }
+    .scanner-table td { padding: 6px 4px; border-bottom: 1px solid rgba(148,163,184,0.06); }
+    .scanner-table tr:last-child td { border-bottom: none; }
+    .sc-sym { font-weight: 600; font-size: 0.75rem; }
+    .sc-num { font-variant-numeric: tabular-nums; }
+    .sc-natr {
+      display: inline-block; padding: 1px 5px; border-radius: 4px;
+      background: rgba(56,189,248,0.1); color: var(--accent); font-size: 0.65rem;
+    }
+    .sc-mv-up { color: var(--accent-2); }
+    .sc-mv-dn { color: var(--accent-danger); }
+    .scanner-empty { text-align: center; color: var(--muted-2); padding: 14px 0; font-size: 0.75rem; }
+    .scanner-btn {
+      background: none; border: 1px solid var(--border); border-radius: 6px;
+      padding: 2px 8px; color: var(--muted); font-size: 0.65rem; cursor: pointer;
+      transition: all 0.15s; line-height: 1.6;
+    }
+    .scanner-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .scanner-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .scanner-ts { font-size: 0.62rem; color: var(--muted-2); margin-top: 8px; text-align: right; }
+
     /* ── MINI SPARKLINE SVG helper styles ─── */
     .spark { display: block; }
 
@@ -405,8 +432,8 @@
   </div>
   <div class="ticker">
     <span class="ticker-name">SOL</span>
-    <span class="ticker-price">$142.50</span>
-    <span class="ticker-change up">+4.71%</span>
+    <span class="ticker-price" id="sol-price">$142.50</span>
+    <span class="ticker-change up" id="sol-ch">+4.71%</span>
     <svg class="mini-chart spark" width="48" height="20" viewBox="0 0 48 20">
       <polyline points="0,16 6,14 12,10 18,12 24,8 30,5 36,7 42,3 48,2"
         fill="none" stroke="#22c55e" stroke-width="1.5"/>
@@ -414,8 +441,8 @@
   </div>
   <div class="ticker">
     <span class="ticker-name">BNB</span>
-    <span class="ticker-price">$598.40</span>
-    <span class="ticker-change up">+1.22%</span>
+    <span class="ticker-price" id="bnb-price">$598.40</span>
+    <span class="ticker-change up" id="bnb-ch">+1.22%</span>
     <svg class="mini-chart spark" width="48" height="20" viewBox="0 0 48 20">
       <polyline points="0,12 6,11 12,13 18,10 24,9 30,8 36,10 42,7 48,6"
         fill="none" stroke="#22c55e" stroke-width="1.5"/>
@@ -423,8 +450,8 @@
   </div>
   <div class="ticker">
     <span class="ticker-name">AVAX</span>
-    <span class="ticker-price">$28.90</span>
-    <span class="ticker-change dn">-1.55%</span>
+    <span class="ticker-price" id="avax-price">$28.90</span>
+    <span class="ticker-change dn" id="avax-ch">-1.55%</span>
     <svg class="mini-chart spark" width="48" height="20" viewBox="0 0 48 20">
       <polyline points="0,5 6,6 12,8 18,7 24,10 30,12 36,11 42,14 48,15"
         fill="none" stroke="#f87171" stroke-width="1.5"/>
@@ -478,6 +505,13 @@
           <span class="agent-name">Voice Agent</span>
         </div>
         <div class="agent-status"></div>
+      </div>
+      <div class="agent-item">
+        <div class="agent-left">
+          <span class="agent-icon">🔍</span>
+          <span class="agent-name">Market Scanner</span>
+        </div>
+        <div class="agent-status" id="scanner-dot"></div>
       </div>
       <div class="agent-item">
         <div class="agent-left">
@@ -599,24 +633,24 @@
         <span style="color:var(--muted-2);font-size:0.65rem">TTM API</span>
       </div>
       <div class="widget-body">
-        <div class="pnl-main" style="color:var(--accent-2)">+$1,247.80</div>
-        <div class="pnl-sub">+1.01% от баланса · 8 марта 2026</div>
+        <div class="pnl-main" id="pnl-today" style="color:var(--accent-2)">—</div>
+        <div class="pnl-sub" id="pnl-today-sub">загрузка...</div>
         <div class="pnl-stats">
           <div class="pnl-stat">
-            <div class="pnl-stat-label">Неделя</div>
-            <div class="pnl-stat-value" style="color:var(--accent-2)">+$4,182</div>
-          </div>
-          <div class="pnl-stat">
-            <div class="pnl-stat-label">Месяц</div>
-            <div class="pnl-stat-value" style="color:var(--accent-2)">+$11,430</div>
-          </div>
-          <div class="pnl-stat">
             <div class="pnl-stat-label">Win rate</div>
-            <div class="pnl-stat-value" style="color:var(--text)">67%</div>
+            <div class="pnl-stat-value" id="pnl-winrate" style="color:var(--text)">—</div>
           </div>
           <div class="pnl-stat">
-            <div class="pnl-stat-label">Сделок</div>
-            <div class="pnl-stat-value" style="color:var(--text)">12 / 4</div>
+            <div class="pnl-stat-label">Сделок (W/L)</div>
+            <div class="pnl-stat-value" id="pnl-trades" style="color:var(--text)">—</div>
+          </div>
+          <div class="pnl-stat">
+            <div class="pnl-stat-label">Net P&L</div>
+            <div class="pnl-stat-value" id="pnl-net" style="color:var(--text)">—</div>
+          </div>
+          <div class="pnl-stat">
+            <div class="pnl-stat-label">Realized</div>
+            <div class="pnl-stat-value" id="pnl-realized" style="color:var(--text)">—</div>
           </div>
         </div>
       </div>
@@ -626,35 +660,10 @@
     <div class="widget">
       <div class="widget-header">
         <div class="label">📈 Открытые позиции</div>
-        <span style="color:var(--accent);font-size:0.7rem">2 активных</span>
+        <span id="positions-count" style="color:var(--accent);font-size:0.7rem">—</span>
       </div>
-      <div class="widget-body">
-        <div class="position-row">
-          <div class="pos-left">
-            <span class="pos-badge long">LONG</span>
-            <div>
-              <div class="pos-symbol">BTCUSDT</div>
-              <div class="pos-size">0.12 BTC · Бинанс · 5x</div>
-            </div>
-          </div>
-          <div class="pos-right">
-            <div class="pos-pnl" style="color:var(--accent-2)">+$842.40</div>
-            <div class="pos-side">+0.84% | Entry $83,410</div>
-          </div>
-        </div>
-        <div class="position-row">
-          <div class="pos-left">
-            <span class="pos-badge long">LONG</span>
-            <div>
-              <div class="pos-symbol">SOLUSDT</div>
-              <div class="pos-size">25 SOL · Байбит · 3x</div>
-            </div>
-          </div>
-          <div class="pos-right">
-            <div class="pos-pnl" style="color:var(--accent-2)">+$405.40</div>
-            <div class="pos-side">+4.52% | Entry $136.20</div>
-          </div>
-        </div>
+      <div class="widget-body" id="positions-list">
+        <div class="scanner-empty">загрузка...</div>
       </div>
     </div>
 
@@ -697,47 +706,19 @@
         <div class="label">📅 Журнал сделок</div>
         <span style="color:var(--muted-2);font-size:0.65rem">TraderMake.Money</span>
       </div>
-      <div class="widget-body">
-        <div class="trade-row">
-          <div class="trade-left">
-            <div class="trade-sym">ETHUSDT <span class="pos-badge long" style="font-size:0.55rem">L</span></div>
-            <div class="trade-time">07:32 · Binance · 2x</div>
-          </div>
-          <div class="trade-right">
-            <div class="trade-pnl" style="color:var(--accent-2)">+$312.40</div>
-            <div class="trade-side">+2.14% · закрыто</div>
-          </div>
-        </div>
-        <div class="trade-row">
-          <div class="trade-left">
-            <div class="trade-sym">BNBUSDT <span class="pos-badge long" style="font-size:0.55rem">L</span></div>
-            <div class="trade-time">06:15 · Bybit · 3x</div>
-          </div>
-          <div class="trade-right">
-            <div class="trade-pnl" style="color:var(--accent-2)">+$187.20</div>
-            <div class="trade-side">+1.22% · закрыто</div>
-          </div>
-        </div>
-        <div class="trade-row">
-          <div class="trade-left">
-            <div class="trade-sym">AVAXUSDT <span class="pos-badge short" style="font-size:0.55rem">S</span></div>
-            <div class="trade-time">05:44 · Bybit · 4x</div>
-          </div>
-          <div class="trade-right">
-            <div class="trade-pnl" style="color:var(--accent-danger)">-$94.80</div>
-            <div class="trade-side">-0.87% · закрыто</div>
-          </div>
-        </div>
-        <div class="trade-row">
-          <div class="trade-left">
-            <div class="trade-sym">SOLUSDT <span class="pos-badge long" style="font-size:0.55rem">L</span></div>
-            <div class="trade-time">04:20 · Binance · 3x</div>
-          </div>
-          <div class="trade-right">
-            <div class="trade-pnl" style="color:var(--accent-2)">+$842.00</div>
-            <div class="trade-side">+4.71% · закрыто</div>
-          </div>
-        </div>
+      <div class="widget-body" id="journal-list">
+        <div class="scanner-empty">загрузка...</div>
+      </div>
+    </div>
+
+    <!-- Market Scanner Widget -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="label">🔍 Bybit Scanner</div>
+        <button class="scanner-btn" id="scan-btn" onclick="runScanner()">↻ Scan</button>
+      </div>
+      <div class="widget-body" id="scanner-body">
+        <div class="scanner-empty">Нажмите Scan для запуска</div>
       </div>
     </div>
 
@@ -787,6 +768,8 @@
 </div>
 
 <script>
+  const API = 'http://localhost:8002/api/v1';
+
   // ── Clock ──────────────────────────────────────────────────────────
   function updateClock() {
     const now = new Date();
@@ -798,18 +781,205 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // ── Fake price ticker animation ────────────────────────────────────
-  const prices = { btc: 84210, eth: 2187 };
-  setInterval(() => {
-    prices.btc += (Math.random() - 0.49) * 40;
-    prices.eth += (Math.random() - 0.50) * 8;
-    document.getElementById('btc-price').textContent = '$' + Math.round(prices.btc).toLocaleString();
-    document.getElementById('eth-price').textContent = '$' + Math.round(prices.eth).toLocaleString();
-  }, 2000);
+  // ── Real prices from Bybit public API ──────────────────────────────
+  async function fetchPrices() {
+    try {
+      const r = await fetch('https://api.bybit.com/v5/market/tickers?category=linear', {cache:'no-store'});
+      const d = await r.json();
+      if (d.retCode !== 0) return;
+      const map = {};
+      for (const t of d.result.list) map[t.symbol] = t;
 
-  // ── Chat ───────────────────────────────────────────────────────────
+      const setTicker = (sym, priceId, chId) => {
+        const t = map[sym];
+        if (!t) return;
+        const price = Number(t.lastPrice);
+        const pct   = (Number(t.price24hPcnt) * 100).toFixed(2);
+        const priceEl = document.getElementById(priceId);
+        if (priceEl) priceEl.textContent = '$' + price.toLocaleString('en-US', {maximumFractionDigits: price < 10 ? 4 : 2});
+        const el = document.getElementById(chId);
+        if (!el) return;
+        el.textContent = (pct > 0 ? '+' : '') + pct + '%';
+        el.className = 'ticker-change ' + (pct > 0 ? 'up' : 'dn');
+      };
+
+      setTicker('BTCUSDT',  'btc-price',  'btc-ch');
+      setTicker('ETHUSDT',  'eth-price',  'eth-ch');
+      setTicker('SOLUSDT',  'sol-price',  'sol-ch');
+      setTicker('BNBUSDT',  'bnb-price',  'bnb-ch');
+      setTicker('AVAXUSDT', 'avax-price', 'avax-ch');
+    } catch (_) {}
+  }
+  fetchPrices();
+  setInterval(fetchPrices, 15000);
+
+  // ── P&L from TTM API ───────────────────────────────────────────────
+  async function fetchPnl() {
+    try {
+      const r = await fetch(`${API}/pnl?duration=today`);
+      if (!r.ok) return;
+      const d = await r.json();
+      const net = d.net_profit_usd ?? 0;
+      const pct = d.win_rate ?? 0;
+      const col = net >= 0 ? 'var(--accent-2)' : 'var(--accent-danger)';
+      const sign = net >= 0 ? '+' : '';
+
+      const el = document.getElementById('pnl-today');
+      if (el) { el.textContent = sign + '$' + Math.abs(net).toFixed(2); el.style.color = col; }
+
+      const sub = document.getElementById('pnl-today-sub');
+      if (sub) sub.textContent = `${sign}${net.toFixed(2)}$ сегодня · ${d.trades_count ?? 0} сделок`;
+
+      const wr = document.getElementById('pnl-winrate');
+      if (wr) wr.textContent = pct + '%';
+
+      const tr = document.getElementById('pnl-trades');
+      if (tr) tr.textContent = `${d.win_count ?? 0} / ${d.loss_count ?? 0}`;
+
+      const netEl = document.getElementById('pnl-net');
+      if (netEl) { netEl.textContent = sign + '$' + Math.abs(net).toFixed(2); netEl.style.color = col; }
+
+      const realEl = document.getElementById('pnl-realized');
+      const realPnl = d.realized_pnl_usd ?? 0;
+      if (realEl) {
+        const s2 = realPnl >= 0 ? '+' : '';
+        realEl.textContent = s2 + '$' + Math.abs(realPnl).toFixed(2);
+        realEl.style.color = realPnl >= 0 ? 'var(--accent-2)' : 'var(--accent-danger)';
+      }
+    } catch (_) {}
+  }
+  fetchPnl();
+  setInterval(fetchPnl, 60000);
+
+  // ── Open Positions from TTM API ────────────────────────────────────
+  async function fetchPositions() {
+    const list = document.getElementById('positions-list');
+    const cnt  = document.getElementById('positions-count');
+    try {
+      const r = await fetch(`${API}/positions`);
+      if (!r.ok) return;
+      const d = await r.json();
+      const pos = d.positions ?? [];
+      if (cnt) cnt.textContent = pos.length ? `${pos.length} активных` : 'нет позиций';
+      if (!list) return;
+      if (!pos.length) {
+        list.innerHTML = '<div class="scanner-empty">Нет открытых позиций</div>';
+        return;
+      }
+      list.innerHTML = pos.map(p => {
+        const sideLbl = (p.side === 'Buy' || p.side === 'Long') ? 'LONG' : 'SHORT';
+        const sideCls = sideLbl === 'LONG' ? 'long' : 'short';
+        const pnl  = p.unrealized_pnl ?? 0;
+        const pnlC = pnl >= 0 ? 'var(--accent-2)' : 'var(--accent-danger)';
+        const pnlS = pnl >= 0 ? '+' : '';
+        const pct  = p.percent ?? 0;
+        const lev  = p.leverage ?? 1;
+        const t    = p.open_time ? new Date(p.open_time).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}) : '—';
+        return `<div class="position-row">
+          <div class="pos-left">
+            <span class="pos-badge ${sideCls}">${sideLbl}</span>
+            <div>
+              <div class="pos-symbol">${escHtml(p.symbol)}</div>
+              <div class="pos-size">${lev}x · ${t}</div>
+            </div>
+          </div>
+          <div class="pos-right">
+            <div class="pos-pnl" style="color:${pnlC}">${pnlS}$${Math.abs(pnl).toFixed(2)}</div>
+            <div class="pos-side">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
+          </div>
+        </div>`;
+      }).join('');
+    } catch (_) {}
+  }
+  fetchPositions();
+  setInterval(fetchPositions, 30000);
+
+  // ── Trade Journal from TTM API ─────────────────────────────────────
+  async function fetchJournal() {
+    const list = document.getElementById('journal-list');
+    if (!list) return;
+    try {
+      const r = await fetch(`${API}/journal?duration=today&limit=8`);
+      if (!r.ok) return;
+      const d = await r.json();
+      const trades = d.trades ?? [];
+      if (!trades.length) {
+        list.innerHTML = '<div class="scanner-empty">Сделок за сегодня нет</div>';
+        return;
+      }
+      list.innerHTML = trades.map(t => {
+        const sideLbl = (t.side === 'Buy' || t.side === 'Long') ? 'L' : 'S';
+        const sideCls = sideLbl === 'L' ? 'long' : 'short';
+        const net  = t.net_profit ?? 0;
+        const netC = net >= 0 ? 'var(--accent-2)' : 'var(--accent-danger)';
+        const netS = net >= 0 ? '+' : '';
+        const pct  = t.percent ?? 0;
+        const lev  = t.leverage ?? 1;
+        const ct   = t.close_time ? new Date(t.close_time).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}) : '—';
+        const status = t.status === 'open' ? 'открыто' : 'закрыто';
+        return `<div class="trade-row">
+          <div class="trade-left">
+            <div class="trade-sym">${escHtml(t.symbol)} <span class="pos-badge ${sideCls}" style="font-size:0.55rem">${sideLbl}</span></div>
+            <div class="trade-time">${ct} · ${lev}x · ${status}</div>
+          </div>
+          <div class="trade-right">
+            <div class="trade-pnl" style="color:${netC}">${netS}$${Math.abs(net).toFixed(2)}</div>
+            <div class="trade-side">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
+          </div>
+        </div>`;
+      }).join('');
+    } catch (_) {}
+  }
+  fetchJournal();
+  setInterval(fetchJournal, 60000);
+
+  // ── Chat: conversation history ─────────────────────────────────────
+  let chatHistory = [];
+  let isSending   = false;
+
+  function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function nowTime() {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  }
+
+  function appendMsg(area, role, avatar, meta, html, extra = '') {
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    div.innerHTML = `
+      <div class="msg-avatar">${avatar}</div>
+      <div class="msg-body">
+        <div class="msg-meta">${meta}</div>
+        <div class="msg-text">${html}</div>
+        ${extra}
+      </div>`;
+    area.appendChild(div);
+  }
+
+  function appendThinking(area, id, t) {
+    const div = document.createElement('div');
+    div.className = 'msg agent';
+    div.id = id;
+    div.innerHTML = `
+      <div class="msg-avatar">🤖</div>
+      <div class="msg-body">
+        <div class="msg-meta">Главный агент · ${t}</div>
+        <div class="tool-call">
+          <div class="tool-spin"></div>
+          <span id="${id}-label">Маршрутизирую запрос...</span>
+        </div>
+      </div>`;
+    area.appendChild(div);
+  }
+
+  // Format newlines from API reply for HTML display
+  function formatReply(text) {
+    return escHtml(text)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+  }
+
   let micActive = false;
-
   function toggleMic() {
     micActive = !micActive;
     const btn = document.getElementById('mic-btn');
@@ -818,75 +988,155 @@
     if (micActive) {
       setTimeout(() => {
         if (micActive) toggleMic();
-        document.getElementById('chat-input').value = 'Покажи мне объём торгов BTC за последние 24 часа';
+        document.getElementById('chat-input').value = 'Покажи мне P&L за сегодня';
       }, 2500);
     }
   }
 
   function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   }
 
-  function sendMessage() {
+  async function sendMessage() {
+    if (isSending) return;
     const input = document.getElementById('chat-input');
-    const text = input.value.trim();
+    const text  = input.value.trim();
     if (!text) return;
     input.value = '';
+    input.style.height = 'auto';
+    isSending = true;
 
-    const area = document.getElementById('chat-area');
-    const now = new Date();
-    const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    const area   = document.getElementById('chat-area');
+    const t      = nowTime();
+    const historySnapshot = [...chatHistory]; // snapshot before push
 
-    // User message
-    area.innerHTML += `
-      <div class="msg user">
-        <div class="msg-avatar">👤</div>
-        <div class="msg-body">
-          <div class="msg-meta">${t}</div>
-          <div class="msg-text">${text.replace(/</g,'&lt;')}</div>
-        </div>
-      </div>`;
+    appendMsg(area, 'user', '👤', t, escHtml(text));
 
-    // Thinking indicator
     const thinkId = 'think-' + Date.now();
-    area.innerHTML += `
-      <div class="msg agent" id="${thinkId}">
-        <div class="msg-avatar">🤖</div>
-        <div class="msg-body">
-          <div class="msg-meta">Главный агент · ${t}</div>
-          <div class="tool-call">
-            <div class="tool-spin"></div>
-            Анализирую запрос, маршрутизирую субагентам...
-          </div>
-        </div>
-      </div>`;
-
+    appendThinking(area, thinkId, t);
     area.scrollTop = area.scrollHeight;
 
-    // Fake response after 1.5s
-    setTimeout(() => {
+    try {
+      const resp = await fetch(`${API}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: historySnapshot }),
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+
+      chatHistory.push({ role: 'user',      content: text });
+      chatHistory.push({ role: 'assistant', content: data.reply });
+
+      // Show which agents were called
+      let chip = '';
+      if (data.tool_calls_made?.length) {
+        const tools = data.tool_calls_made.map(n => `🔧 ${n}`).join(' · ');
+        chip = `<div class="msg-chip">${tools}</div>`;
+      }
+
       document.getElementById(thinkId)?.remove();
-      area.innerHTML += `
-        <div class="msg agent">
-          <div class="msg-avatar">🤖</div>
-          <div class="msg-body">
-            <div class="msg-meta">Главный агент · ${t}</div>
-            <div class="msg-text">Получил запрос: <em>"${text.replace(/</g,'&lt;')}"</em><br><br>
-            В MVP-версии я подключён к Claude API. После интеграции субагентов здесь будет полный анализ.
-            </div>
-          </div>
-        </div>`;
-      area.scrollTop = area.scrollHeight;
-    }, 1500);
+      appendMsg(area, 'agent', '🤖', `Главный агент · ${t}`, formatReply(data.reply), chip);
+
+    } catch (err) {
+      document.getElementById(thinkId)?.remove();
+      appendMsg(area, 'agent', '🤖', `Главный агент · ${t}`,
+        `⚠️ Ошибка подключения к API:<br><code>${escHtml(err.message)}</code><br><br>` +
+        `Убедитесь что Orchestrator запущен на <strong>localhost:8002</strong>`);
+    }
+
+    isSending = false;
+    area.scrollTop = area.scrollHeight;
+  }
+
+  // ── Market Scanner Widget ──────────────────────────────────────────
+  async function runScanner() {
+    const body = document.getElementById('scanner-body');
+    const btn  = document.getElementById('scan-btn');
+    const dot  = document.getElementById('scanner-dot');
+
+    btn.disabled = true;
+    btn.textContent = '...';
+    if (dot) { dot.classList.remove('off'); dot.classList.add('busy'); }
+    body.innerHTML = `<div class="scanner-empty">
+      <div class="tool-spin" style="margin:0 auto 8px;width:16px;height:16px;border-width:2px"></div>
+      Сканирую Bybit USDT Perps...
+    </div>`;
+
+    try {
+      const r = await fetch(`${API}/scan?top_n=8&min_vol=30000000&min_range=3.0`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      renderScanner(body, data);
+    } catch (err) {
+      body.innerHTML = `<div class="scanner-empty" style="color:var(--accent-danger)">
+        Ошибка: ${escHtml(err.message)}
+      </div>`;
+    }
+
+    btn.disabled = false;
+    btn.textContent = '↻ Scan';
+    if (dot) { dot.classList.remove('busy'); }
+  }
+
+  function renderScanner(body, data) {
+    const syms = data.symbols || [];
+    if (!syms.length) {
+      body.innerHTML = `<div class="scanner-empty">
+        Нет кандидатов по текущим фильтрам.<br>
+        <span style="font-size:0.65rem;color:var(--muted-2)">
+          Просканировано ${data.meta?.total_symbols || '—'} инструментов
+        </span>
+      </div>`;
+      return;
+    }
+
+    // Find the natr key (e.g. "natr_5m_14")
+    const natrKey = Object.keys(syms[0]).find(k => k.startsWith('natr_')) || 'natr_5m_14';
+
+    let rows = syms.map(s => {
+      const mv    = s.move_5m_pct;
+      const mvCls = mv >= 0 ? 'sc-mv-up' : 'sc-mv-dn';
+      const mvStr = (mv >= 0 ? '+' : '') + mv.toFixed(2) + '%';
+      const vol   = s.quote_volume_24h >= 1e9
+        ? '$' + (s.quote_volume_24h / 1e9).toFixed(1) + 'B'
+        : '$' + Math.round(s.quote_volume_24h / 1e6) + 'M';
+      const sym   = s.symbol.replace('USDT', '');
+      return `<tr>
+        <td><span class="sc-sym">${sym}</span></td>
+        <td class="sc-num">${s.range_24h_pct.toFixed(1)}%</td>
+        <td><span class="sc-natr">${s[natrKey].toFixed(2)}%</span></td>
+        <td class="sc-num ${mvCls}">${mvStr}</td>
+        <td class="sc-num" style="color:var(--muted-2)">${vol}</td>
+      </tr>`;
+    }).join('');
+
+    const ts = data.timestamp
+      ? new Date(data.timestamp * 1000).toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'})
+      : '';
+    const natrLabel = natrKey.replace('_', '(').replace('_', ',').slice(0, -0) + ')';
+
+    body.innerHTML = `
+      <table class="scanner-table">
+        <thead><tr>
+          <th>Пара</th>
+          <th>Rng 24h</th>
+          <th>NATR 5m</th>
+          <th>Mv 5m</th>
+          <th>Vol</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="scanner-ts">
+        ${syms.length} из ${data.meta?.after_range_filter || '?'} · обновлено ${ts}
+      </div>`;
   }
 
   // ── Alerts ─────────────────────────────────────────────────────────
   function toggleAlerts() {
     const badge = document.getElementById('alert-count');
-    badge.style.display = badge.style.display === 'none' ? 'flex' : 'none';
+    // Fix: badge has display:flex from CSS — toggle visibility instead
+    badge.hidden = !badge.hidden;
   }
 
   // ── Auto-resize textarea ───────────────────────────────────────────

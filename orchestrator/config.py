@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     ttm_api_key: str = ""
     ttm_base_url: str = "https://tradermake.money/api/v2"
 
+    # Bybit
+    bybit_base_url:    str = "https://api.bybit.com/v5"
+    bybit_api_key:     str = ""
+    bybit_api_secret:  str = ""
+
     # Whisper service
     whisper_base_url: str = "http://whisper-api:8001"
 

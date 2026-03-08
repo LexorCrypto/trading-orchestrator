@@ -7,208 +7,184 @@
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     :root {
-      --bg-0: #000;
       --bg-1: #020617;
       --bg-2: #0f172a;
       --text: #e5e7eb;
       --muted: #9ca3af;
+      --muted-2: #6b7280;
       --border: rgba(148, 163, 184, 0.22);
       --accent: #38bdf8;
       --accent-2: #22c55e;
+      --accent-warn: #fbbf24;
+      --accent-danger: #f87171;
+      --accent-purple: #a78bfa;
+      --radius: 14px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 15% 12%, rgba(56, 189, 248, 0.14), transparent 42%),
-        radial-gradient(circle at 78% 8%, rgba(34, 197, 94, 0.12), transparent 45%),
+        radial-gradient(circle at 15% 12%, rgba(56,189,248,0.12), transparent 42%),
+        radial-gradient(circle at 78% 8%,  rgba(34,197,94,0.10),  transparent 45%),
         radial-gradient(circle at top left, #0f172a 0%, #020617 45%, #000 100%);
       color: var(--text);
       min-height: 100vh;
       padding: 32px 24px;
     }
+
+    /* ── Header ─────────────────────────────────────────────── */
     header {
-      max-width: 1200px;
-      margin: 0 auto 40px;
+      max-width: 1280px;
+      margin: 0 auto 36px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
       padding-bottom: 20px;
       border-bottom: 1px solid var(--border);
     }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .logo { display: flex; align-items: center; gap: 12px; }
     .logo-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
+      width: 10px; height: 10px; border-radius: 50%;
       background: var(--accent);
       box-shadow: 0 0 8px var(--accent);
       animation: pulse 2s ease-in-out infinite;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    .logo h1 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text);
-    }
-    .logo span {
-      font-size: 0.75rem;
-      color: var(--accent);
-      letter-spacing: 0.05em;
-    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+    .logo h1 { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+    .logo span { font-size: 0.75rem; color: var(--accent); letter-spacing: 0.06em; }
+    .header-badges { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .badge {
-      font-size: 0.7rem;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      letter-spacing: 0.08em;
+      font-size: 0.68rem; padding: 4px 10px;
+      border-radius: 999px; border: 1px solid var(--border);
+      color: var(--muted); letter-spacing: 0.08em;
     }
+    .badge.live { border-color: rgba(34,197,94,0.5); color: var(--accent-2); background: rgba(34,197,94,0.08); }
+    .badge.mock { border-color: rgba(251,191,36,0.5); color: var(--accent-warn); background: rgba(251,191,36,0.06); }
+    .badge.plan { border-color: rgba(167,139,250,0.4); color: var(--accent-purple); background: rgba(167,139,250,0.06); }
 
+    /* ── Tabs ─────────────────────────────────────────────── */
     .tabs {
-      max-width: 1200px;
-      margin: 0 auto 32px;
-      display: flex;
-      gap: 8px;
+      max-width: 1280px;
+      margin: 0 auto 28px;
+      display: flex; gap: 8px; flex-wrap: wrap;
     }
     .tab {
-      padding: 8px 20px;
-      border-radius: 8px;
+      padding: 8px 18px; border-radius: 8px;
       border: 1px solid var(--border);
       background: rgba(15,23,42,0.4);
-      color: var(--muted);
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 0.04em;
+      color: var(--muted); font-size: 0.83rem;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.04em;
     }
     .tab.active, .tab:hover {
-      border-color: var(--accent);
-      color: var(--accent);
+      border-color: var(--accent); color: var(--accent);
       background: rgba(56,189,248,0.08);
     }
 
-    .section {
-      max-width: 1200px;
-      margin: 0 auto 40px;
-      display: none;
-    }
+    /* ── Sections ─────────────────────────────────────────── */
+    .section { max-width: 1280px; margin: 0 auto 40px; display: none; }
     .section.active { display: block; }
 
     .card {
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15,23,42,0.65);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: var(--radius);
       padding: 28px;
       backdrop-filter: blur(12px);
+      margin-bottom: 20px;
     }
     .card h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--accent);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 0.95rem; font-weight: 600; color: var(--accent);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 22px;
+      display: flex; align-items: center; gap: 8px;
     }
 
-    /* Mermaid overrides */
-    .mermaid {
-      display: flex;
-      justify-content: center;
-    }
-    .mermaid svg {
-      max-width: 100%;
-      height: auto;
-    }
+    /* ── Mermaid ──────────────────────────────────────────── */
+    .mermaid { display: flex; justify-content: center; }
+    .mermaid svg { max-width: 100%; height: auto; }
 
-    /* ASCII section */
+    /* ── ASCII ────────────────────────────────────────────── */
     .ascii-box {
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.55);
       border: 1px solid rgba(56,189,248,0.3);
       border-radius: 12px;
       padding: 24px;
-      font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
-      font-size: 0.78rem;
-      line-height: 1.7;
-      color: #7dd3fc;
-      white-space: pre;
-      overflow-x: auto;
+      font-family: "SF Mono","Fira Code","Cascadia Code",monospace;
+      font-size: 0.77rem; line-height: 1.75;
+      color: #7dd3fc; white-space: pre; overflow-x: auto;
     }
 
-    /* Stack table */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-    }
+    /* ── Stack table ──────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
     th {
-      text-align: left;
-      padding: 10px 14px;
-      color: var(--accent);
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      text-align: left; padding: 10px 14px;
+      color: var(--accent); font-size: 0.73rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
       border-bottom: 1px solid var(--border);
     }
-    td {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(148,163,184,0.1);
-      color: var(--text);
-    }
-    td:first-child { color: var(--accent-2); font-weight: 600; }
+    td { padding: 11px 14px; border-bottom: 1px solid rgba(148,163,184,0.1); color: var(--text); vertical-align: top; }
+    td:first-child { color: var(--accent-2); font-weight: 600; white-space: nowrap; }
+    td code { font-size: 0.78rem; color: #7dd3fc; background: rgba(56,189,248,0.08); padding: 1px 5px; border-radius: 4px; }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(56,189,248,0.04); }
+    tr:hover td { background: rgba(56,189,248,0.03); }
 
-    /* Phases */
-    .phases {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-    }
+    .st-live   { color: var(--accent-2) !important; }
+    .st-mock   { color: var(--accent-warn) !important; }
+    .st-plan   { color: var(--accent-purple) !important; }
+    .st-future { color: var(--muted-2) !important; }
+
+    /* ── Phases ───────────────────────────────────────────── */
+    .phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 16px; }
     .phase {
       background: rgba(0,0,0,0.3);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 12px; padding: 22px;
+      position: relative;
     }
-    .phase-num {
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-    .phase h3 {
-      font-size: 0.92rem;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--text);
-    }
-    .phase ul {
-      list-style: none;
-      font-size: 0.82rem;
-      color: var(--muted);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .phase ul li::before { content: "→ "; color: var(--accent-2); }
-    .phase-1 { border-color: rgba(56,189,248,0.4); }
+    .phase-done { border-color: rgba(34,197,94,0.45); }
+    .phase-1 { border-color: rgba(56,189,248,0.45); }
     .phase-2 { border-color: rgba(34,197,94,0.3); }
     .phase-3 { border-color: rgba(251,191,36,0.3); }
     .phase-4 { border-color: rgba(167,139,250,0.3); }
+    .phase-num { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+    .phase h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; color: var(--text); }
+    .phase ul { list-style: none; font-size: 0.8rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+    .phase ul li::before { content: "→ "; color: var(--accent-2); }
+    .phase-status {
+      position: absolute; top: 14px; right: 14px;
+      font-size: 0.62rem; padding: 2px 8px; border-radius: 999px;
+      font-weight: 600; letter-spacing: 0.06em;
+    }
+    .ps-done { background: rgba(34,197,94,0.15); color: var(--accent-2); border: 1px solid rgba(34,197,94,0.35); }
+    .ps-active { background: rgba(251,191,36,0.12); color: var(--accent-warn); border: 1px solid rgba(251,191,36,0.35); }
+    .ps-plan { background: rgba(167,139,250,0.1); color: var(--accent-purple); border: 1px solid rgba(167,139,250,0.3); }
+
+    /* ── Files tab ────────────────────────────────────────── */
+    .file-tree {
+      font-family: "SF Mono","Fira Code","Cascadia Code",monospace;
+      font-size: 0.8rem; line-height: 1.9; color: var(--muted);
+    }
+    .file-tree .dir { color: var(--accent); font-weight: 600; }
+    .file-tree .py  { color: #7dd3fc; }
+    .file-tree .cfg { color: var(--accent-warn); }
+    .file-tree .html{ color: var(--accent-purple); }
+    .file-tree .note{ color: var(--muted-2); font-size: 0.72rem; margin-left: 4px; }
+    .file-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 700px) { .file-grid { grid-template-columns: 1fr; } }
+
+    /* ── Agent cards ──────────────────────────────────────── */
+    .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); gap: 14px; }
+    .agent-card {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px;
+    }
+    .agent-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .agent-card-name { font-weight: 600; font-size: 0.85rem; }
+    .agent-card-file { font-size: 0.7rem; color: #7dd3fc; margin-bottom: 10px; }
+    .agent-card-desc { font-size: 0.76rem; color: var(--muted); line-height: 1.5; }
+    .agent-card-live  { border-color: rgba(34,197,94,0.4); }
+    .agent-card-mock  { border-color: rgba(251,191,36,0.3); }
+    .agent-card-plan  { border-color: rgba(167,139,250,0.3); }
   </style>
 </head>
 <body>
@@ -218,211 +194,525 @@
     <div class="logo-dot"></div>
     <div>
       <h1>Виртуальный офис трейдера</h1>
-      <span>Архитектура системы · claude-opus-4-6</span>
+      <span>Архитектура системы · claude-opus-4-6 · FastAPI · порт 8002</span>
     </div>
   </div>
-  <span class="badge">v0.1 · MVP</span>
+  <div class="header-badges">
+    <span class="badge live">✓ Live: TTM API · Bybit Scanner</span>
+    <span class="badge mock">⏳ Mock: Analyst · News · Voice</span>
+    <span class="badge plan">◦ Plan: Research · pgvector</span>
+    <span class="badge">v0.2 · Фаза 1 выполнена</span>
+  </div>
 </header>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab('diagram')">Диаграмма</div>
-  <div class="tab" onclick="showTab('ascii')">ASCII-схема</div>
-  <div class="tab" onclick="showTab('stack')">Технологический стек</div>
-  <div class="tab" onclick="showTab('phases')">Фазы реализации</div>
+  <div class="tab active"  onclick="showTab(event,'diagram')">Диаграмма</div>
+  <div class="tab"         onclick="showTab(event,'ascii')">ASCII-схема</div>
+  <div class="tab"         onclick="showTab(event,'agents')">Субагенты</div>
+  <div class="tab"         onclick="showTab(event,'stack')">Тех. стек</div>
+  <div class="tab"         onclick="showTab(event,'phases')">Фазы</div>
+  <div class="tab"         onclick="showTab(event,'files')">Файлы</div>
 </div>
 
-<!-- TAB: Mermaid Diagram -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB: Mermaid Diagram                                       -->
+<!-- ══════════════════════════════════════════════════════════ -->
 <div class="section active" id="tab-diagram">
   <div class="card">
-    <h2>⬡ Архитектурная схема</h2>
+    <h2>⬡ Архитектурная схема (актуальная)</h2>
     <div class="mermaid">
 graph TD
     USER["👤 Трейдер"]:::user
 
     subgraph INPUT["📥 Входные каналы"]
-        VOICE["🎙️ Голосовой ввод\nTelegram / Web mic"]
-        TEXT["💬 Текстовый чат\nTelegram / WebUI"]
-        MARKET["📊 Маркет-данные\nWebSocket feeds"]
+        TEXT["💬 Текстовый чат\ndashboard.html · WebUI"]
+        WS["🔌 WebSocket /ws/chat\nстриминг токенов"]
     end
 
-    subgraph CORE["🧠 Главный агент — Orchestrator"]
-        MAIN["MAIN AGENT\nclaude-opus-4-6\n───────────────\n• Разбор интента\n• Маршрутизация задач\n• Синтез ответа\n• Управление памятью"]
+    subgraph CORE["🧠 Главный агент — Orchestrator (порт 8002)"]
+        MAIN["MAIN AGENT\nclaude-opus-4-6\n────────────────\n• Разбор интента\n• Маршрутизация tool_use\n• Синтез ответа\n• До 5 итераций"]
     end
 
-    subgraph AGENTS["🤖 Субагенты"]
-        SA1["📡 Market Analyst\n─────────────\n• Анализ цены / объёма\n• TA-индикаторы\n• Паттерны свечей\n• Уровни S/R"]
-        SA2["📰 News Monitor\n─────────────\n• Крипто-новости\n• Sentiment анализ\n• Фильтр сигналов\n• Alerts"]
-        SA3["📋 Trade Manager\n─────────────\n• TTM API интеграция\n• Журнал сделок\n• P&L трекинг\n• Статистика"]
-        SA4["⚠️ Risk Guardian\n─────────────\n• Расчёт риска\n• Drawdown лимиты\n• Позиция sizing\n• Stop-loss advice"]
-        SA5["🎙️ Voice Agent\n─────────────\n• Whisper транскрипция\n• TTS ответы\n• Голосовые команды\n• Briefing дня"]
-        SA6["📚 Research Agent\n─────────────\n• On-chain данные\n• DeFi протоколы\n• Web-поиск\n• Отчёты / PDF"]
+    subgraph AGENTS["🤖 Субагенты (registry.py)"]
+        SA1["📡 Market Analyst\n────────────\nMOCK — Фаза 2\nTA-индикаторы\nУровни S/R"]
+        SA2["📰 News Monitor\n────────────\nMOCK — Фаза 2\nSentiment анализ\nCryptoCompare RSS"]
+        SA3["📋 Trade Manager\n────────────\nLIVE — ttm_client\nP&L · Журнал\nПозиции · Риск"]
+        SA4["⚠️ Risk Guardian\n────────────\nMOCK — Фаза 3\nDrawdown лимиты\nPosition sizing"]
+        SA5["🔍 Market Scanner\n────────────\nLIVE — bybit_client\nNATR 14 · 5m\nTop-N кандидаты"]
+        SA6["📚 Research Agent\n────────────\nMOCK — Фаза 4\nOn-chain · PDF\nWeb-поиск"]
     end
 
-    subgraph MEMORY["🗄️ Память и хранилище"]
-        MEM1["Short-term\nconversation ctx"]
-        MEM2["Long-term\nVector DB / pgvector"]
-        MEM3["Trade Journal\nStructured DB"]
+    subgraph RISK["📊 Risk Report Engine"]
+        RR["risk_report.py\n────────────\npnl_pct_depo\nMPP/MPU zones\nWarning/Stop flags"]
     end
 
     subgraph EXTERNAL["🌐 Внешние API"]
-        EXT1["TraderMake.Money API\nttm_me.py · tmm_today.py"]
-        EXT2["Биржи\nBinance / Bybit WS"]
-        EXT3["News APIs\nCryptoCompare / RSS"]
-        EXT4["On-chain\nDune / Nansen / Arkham"]
+        EXT1["TraderMake.Money\nAPI v2 · /trades · /auth/me"]
+        EXT2["Bybit V5 REST\n/market/tickers · /market/kline\n/position/list · /wallet-balance"]
+        EXT3["Anthropic API\nclaude-opus-4-6"]
     end
 
-    subgraph OUTPUT["📤 Выходные каналы"]
-        OUT1["📱 Telegram Bot\nответы + алерты"]
-        OUT2["🖥️ Web Dashboard\nNext.js"]
-        OUT3["🔔 Push Notifications"]
+    subgraph OUTPUT["📤 Выход / Dashboard"]
+        OUT1["GET /scan\nBybit Scanner Widget"]
+        OUT2["GET /pnl · /positions · /journal\nP&L · Позиции · Журнал"]
+        OUT3["POST /chat\nОтвет агента + tool_calls"]
     end
 
-    USER --> VOICE & TEXT
-    MARKET --> MAIN
-    VOICE --> SA5 --> MAIN
+    USER --> TEXT & WS
     TEXT --> MAIN
+    WS --> MAIN
+    MAIN --> EXT3
 
-    MAIN --> SA1 & SA2 & SA3 & SA4 & SA6
-    MAIN <--> MEM1 & MEM2
+    MAIN --> SA1 & SA2 & SA3 & SA4 & SA5 & SA6
 
-    SA3 <--> MEM3
     SA3 --> EXT1
-    SA1 --> EXT2
-    SA2 --> EXT3
-    SA6 --> EXT4
+    SA3 --> RR
+    RR --> EXT1
+    SA5 --> EXT2
 
-    MAIN --> OUT1 & OUT2 & OUT3
+    MAIN --> OUT3
+    SA3 --> OUT2
+    SA5 --> OUT1
 
     classDef user fill:#00d4ff,color:#000,stroke:#00d4ff
-    classDef agent fill:#1a2740,color:#00d4ff,stroke:#00d4ff
-    classDef sub fill:#0d1f33,color:#7dd3fc,stroke:#334155
-    classDef mem fill:#0f2a1a,color:#4ade80,stroke:#166534
-    classDef ext fill:#1f1a00,color:#fbbf24,stroke:#92400e
-    classDef out fill:#1a1040,color:#a78bfa,stroke:#5b21b6
+    classDef live fill:#0a2a18,color:#4ade80,stroke:#166534
+    classDef mock fill:#2a2000,color:#fbbf24,stroke:#92400e
     </div>
   </div>
 </div>
 
-<!-- TAB: ASCII -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB: ASCII                                                 -->
+<!-- ══════════════════════════════════════════════════════════ -->
 <div class="section" id="tab-ascii">
   <div class="card">
     <h2>⬡ ASCII-схема</h2>
-    <div class="ascii-box">┌──────────────────────────────────────────────────────────────────┐
-│                    ВИРТУАЛЬНЫЙ ОФИС ТРЕЙДЕРА                     │
-│                 Multi-Agent Trading Command Center               │
-└──────────────────────────────────────────────────────────────────┘
+    <div class="ascii-box">┌──────────────────────────────────────────────────────────────────────────┐
+│                      ВИРТУАЛЬНЫЙ ОФИС ТРЕЙДЕРА                           │
+│               Multi-Agent Trading Command Center  ·  v0.2                │
+└──────────────────────────────────────────────────────────────────────────┘
 
-  ┌─────────────┐   ┌─────────────┐   ┌──────────────────────────┐
-  │ Голос / TG  │   │ Текст / Web │   │  Маркет WebSocket feeds  │
-  └──────┬──────┘   └──────┬──────┘   └────────────┬─────────────┘
-         │                 │                        │
-         ▼                 ▼                        ▼
-  ┌─────────────────────────────────────────────────────────────────┐
-  │              🧠  ГЛАВНЫЙ АГЕНТ  (Orchestrator)                  │
-  │               claude-opus-4-6 / claude-sonnet-4-6               │
-  │                                                                 │
-  │   • Разбор интента          • Маршрутизация задач              │
-  │   • Синтез финального ответа • Управление памятью              │
-  └──────┬───────┬───────┬───────┬───────┬───────┬────────────────-┘
-         │       │       │       │       │       │
-         ▼       ▼       ▼       ▼       ▼       ▼
-  ┌──────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌──────┐
-  │Mkt   │ │News │ │Trade│ │Risk │ │Voice│ │Resrch│
-  │Analy-│ │Monit│ │ Mgr │ │Guard│ │Agent│ │Agent │
-  │yst   │ │     │ │(TTM)│ │     │ │(Wsp)│ │      │
-  └──┬───┘ └──┬──┘ └──┬──┘ └─────┘ └─────┘ └──┬───┘
-     │        │       │                         │
-  Binance  Crypto  TTM API                   Dune /
-  Bybit WS  RSS   Journal DB                Nansen
+  ┌──────────────────┐    ┌─────────────────────┐
+  │  Текст / WebUI   │    │  WebSocket /ws/chat  │
+  │  POST /chat      │    │  стриминг токенов    │
+  └────────┬─────────┘    └──────────┬───────────┘
+           │                         │
+           ▼                         ▼
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │                🧠  ГЛАВНЫЙ АГЕНТ  (Orchestrator)                    │
+  │                  claude-opus-4-6  ·  FastAPI  ·  порт 8002          │
+  │                                                                     │
+  │   • Разбор интента          • Маршрутизация tool_use               │
+  │   • Синтез финального ответа • Agentic loop (до 5 итераций)        │
+  └─┬──────────┬──────────┬──────────┬──────────┬──────────┬───────────┘
+    │          │          │          │          │          │
+    ▼          ▼          ▼          ▼          ▼          ▼
+  ┌──────┐ ┌──────┐ ┌──────────┐ ┌──────┐ ┌──────────┐ ┌──────┐
+  │Mkt   │ │News  │ │ Trade    │ │Risk  │ │ Market   │ │Resch │
+  │Anlyst│ │Monit │ │ Manager  │ │Guard │ │ Scanner  │ │Agent │
+  │MOCK  │ │MOCK  │ │ LIVE ✓   │ │MOCK  │ │ LIVE ✓   │ │MOCK  │
+  └──────┘ └──────┘ └────┬─────┘ └──────┘ └────┬─────┘ └──────┘
+                          │                      │
+                    ┌─────┴──────┐         ┌─────┴──────┐
+                    │ TTM API v2 │         │ Bybit V5   │
+                    │ /trades    │         │ REST API   │
+                    │ /auth/me   │         │ tickers    │
+                    └─────┬──────┘         │ klines     │
+                          │                └────────────┘
+                    ┌─────┴──────┐
+                    │risk_report │
+                    │ MPP · MPU  │
+                    │ zones      │
+                    └────────────┘
 
-  ┌─────────────────────────────────────────────────────────────────┐
-  │ Память:  [Short-term ctx]  [Vector DB / pgvector]  [Trade DB]  │
-  └─────────────────────────────────────────────────────────────────┘
-
-  ┌─────────────────────────────────────────────────────────────────┐
-  │ Вывод:   [Telegram Bot]   [Web Dashboard]   [Push Alerts]      │
-  └─────────────────────────────────────────────────────────────────┘</div>
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │ REST эндпоинты (прямые, без Claude):                                │
+  │   GET /api/v1/scan        →  Bybit Scanner (top-N NATR)            │
+  │   GET /api/v1/pnl         →  P&L за период (TTM)                   │
+  │   GET /api/v1/positions   →  Открытые позиции (TTM)                │
+  │   GET /api/v1/journal     →  История сделок (TTM)                  │
+  │   GET /api/v1/health      →  Статус API                            │
+  └─────────────────────────────────────────────────────────────────────┘</div>
   </div>
 </div>
 
-<!-- TAB: Stack -->
-<div class="section" id="tab-stack">
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB: Agents                                                -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section" id="tab-agents">
   <div class="card">
-    <h2>⬡ Технологический стек</h2>
+    <h2>⬡ Субагенты — текущий статус</h2>
+    <div class="agent-grid">
+
+      <div class="agent-card agent-card-live">
+        <div class="agent-card-top">
+          <span class="agent-card-name">📋 Trade Manager</span>
+          <span class="badge live">✓ Live</span>
+        </div>
+        <div class="agent-card-file">ttm_client.py + risk_report.py</div>
+        <div class="agent-card-desc">
+          TraderMake.Money API v2 · P&L, журнал сделок, открытые позиции, мини-Aladdin риск-отчёт (MPP/MPU/zone/flags)
+        </div>
+      </div>
+
+      <div class="agent-card agent-card-live">
+        <div class="agent-card-top">
+          <span class="agent-card-name">🔍 Market Scanner</span>
+          <span class="badge live">✓ Live</span>
+        </div>
+        <div class="agent-card-file">market_scanner_bybit.py + bybit_client.py</div>
+        <div class="agent-card-desc">
+          Bybit V5 REST · USDT Perp · фильтры объём/диапазон · NATR(14) на 5m · move_5m по 1m · Top-N sorted by NATR
+        </div>
+      </div>
+
+      <div class="agent-card agent-card-mock">
+        <div class="agent-card-top">
+          <span class="agent-card-name">📡 Market Analyst</span>
+          <span class="badge mock">Mock — Фаза 2</span>
+        </div>
+        <div class="agent-card-file">registry.py → _market_analyst()</div>
+        <div class="agent-card-desc">
+          Возвращает фиксированные BTCUSDT данные. Фаза 2: реальные TA-индикаторы (RSI/MACD/BB) через Bybit klines
+        </div>
+      </div>
+
+      <div class="agent-card agent-card-mock">
+        <div class="agent-card-top">
+          <span class="agent-card-name">📰 News Monitor</span>
+          <span class="badge mock">Mock — Фаза 2</span>
+        </div>
+        <div class="agent-card-file">registry.py → _news_monitor()</div>
+        <div class="agent-card-desc">
+          3 захардкоженные новости. Фаза 2: CryptoCompare API + RSS парсер + sentiment классификация
+        </div>
+      </div>
+
+      <div class="agent-card agent-card-mock">
+        <div class="agent-card-top">
+          <span class="agent-card-name">⚠️ Risk Guardian</span>
+          <span class="badge mock">Mock — Фаза 3</span>
+        </div>
+        <div class="agent-card-file">registry.py → _risk_guardian()</div>
+        <div class="agent-card-desc">
+          Фиктивный drawdown 8.2%, margin 23%. Реальный risk_report.py уже есть для Trade Manager. Фаза 3: интеграция с Bybit positions
+        </div>
+      </div>
+
+      <div class="agent-card agent-card-plan">
+        <div class="agent-card-top">
+          <span class="agent-card-name">📚 Research Agent</span>
+          <span class="badge plan">◦ Фаза 4</span>
+        </div>
+        <div class="agent-card-file">registry.py → _research_agent()</div>
+        <div class="agent-card-desc">
+          Возвращает заглушку. Фаза 4: Dune Analytics, Nansen, Arkham, web-поиск, PDF-анализ
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>⬡ Bybit Client — публичный интерфейс</h2>
     <table>
-      <thead>
-        <tr><th>Слой</th><th>Технология</th><th>Статус</th></tr>
-      </thead>
+      <thead><tr><th>Функция</th><th>Эндпоинт Bybit</th><th>Auth</th><th>Используется в</th></tr></thead>
       <tbody>
-        <tr><td>Orchestrator</td><td>Python + anthropic SDK (claude-opus-4-6)</td><td style="color:#4ade80">Проектируется</td></tr>
-        <tr><td>Субагенты</td><td>Python async + tool_use (function calling)</td><td style="color:#4ade80">Проектируется</td></tr>
-        <tr><td>API слой</td><td>FastAPI — расширение существующего Whisper Bot</td><td style="color:#fbbf24">Существует (порт 8001)</td></tr>
-        <tr><td>Память краткосрочная</td><td>Redis (conversation context)</td><td style="color:#4ade80">Добавляется</td></tr>
-        <tr><td>Память долгосрочная</td><td>pgvector / Chroma (vector embeddings)</td><td style="color:#4ade80">Добавляется</td></tr>
-        <tr><td>Frontend</td><td>Next.js 14 + Tailwind CSS (тёмная тема из Test/)</td><td style="color:#4ade80">Проектируется</td></tr>
-        <tr><td>Real-time</td><td>WebSocket (FastAPI) + Server-Sent Events</td><td style="color:#4ade80">Добавляется</td></tr>
-        <tr><td>Голос — STT</td><td>OpenAI Whisper (существующий сервис)</td><td style="color:#fbbf24">Существует (порт 8001)</td></tr>
-        <tr><td>Голос — TTS</td><td>ElevenLabs API</td><td style="color:#4ade80">Добавляется</td></tr>
-        <tr><td>Данные трейдов</td><td>TraderMake.Money API (ttm_me.py, tmm_today.py)</td><td style="color:#fbbf24">Существует</td></tr>
-        <tr><td>Маркет-данные</td><td>Binance / Bybit WebSocket</td><td style="color:#4ade80">Добавляется</td></tr>
-        <tr><td>Новости</td><td>CryptoCompare API + RSS feeds</td><td style="color:#4ade80">Добавляется</td></tr>
-        <tr><td>On-chain</td><td>Dune Analytics / Nansen / Arkham</td><td style="color:#7dd3fc">Фаза 4</td></tr>
-        <tr><td>Деплой</td><td>Docker Compose — расширение существующего</td><td style="color:#fbbf24">Существует (базовый)</td></tr>
+        <tr><td><code>get_usdt_perp_symbols()</code></td><td>/market/tickers</td><td>Нет</td><td>Market Scanner (шаг 1)</td></tr>
+        <tr><td><code>get_24h_stats(symbols)</code></td><td>/market/tickers</td><td>Нет</td><td>Market Scanner (шаг 2)</td></tr>
+        <tr><td><code>get_klines(symbol, interval, limit)</code></td><td>/market/kline</td><td>Нет</td><td>Market Scanner (шаги 4,6)</td></tr>
+        <tr><td><code>get_wallet_balance()</code></td><td>/account/wallet-balance</td><td>HMAC-SHA256</td><td>Risk Guardian (Фаза 3)</td></tr>
+        <tr><td><code>get_positions()</code></td><td>/position/list</td><td>HMAC-SHA256</td><td>Risk Guardian (Фаза 3)</td></tr>
+        <tr><td><code>get_executions()</code></td><td>/execution/list</td><td>HMAC-SHA256</td><td>Risk Guardian (Фаза 3)</td></tr>
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- TAB: Phases -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB: Stack                                                  -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section" id="tab-stack">
+  <div class="card">
+    <h2>⬡ Технологический стек — актуальный статус</h2>
+    <table>
+      <thead>
+        <tr><th>Слой</th><th>Технология / файлы</th><th>Статус</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Orchestrator</td>
+          <td>Python 3.11+ · FastAPI · <code>orchestrator/main.py</code> · порт 8002<br>
+              Agentic loop: до 5 итераций, <code>tool_use</code> / <code>end_turn</code></td>
+          <td class="st-live">✅ Реализовано</td>
+        </tr>
+        <tr>
+          <td>Главный агент</td>
+          <td>anthropic SDK · <code>claude-opus-4-6</code> · <code>orchestrator/api/routes.py</code></td>
+          <td class="st-live">✅ Реализовано</td>
+        </tr>
+        <tr>
+          <td>Субагенты — реестр</td>
+          <td><code>orchestrator/agents/registry.py</code> · 6 tool-схем + диспетчер<br>
+              <code>AGENT_TOOLS</code> → <code>route_tool_call()</code></td>
+          <td class="st-live">✅ Реализовано</td>
+        </tr>
+        <tr>
+          <td>Trade Manager</td>
+          <td><code>orchestrator/agents/ttm_client.py</code><br>
+              TTM API v2: <code>/auth/me</code>, <code>/trades</code> (pagination, sortBy=close_time)</td>
+          <td class="st-live">✅ Реализовано (live)</td>
+        </tr>
+        <tr>
+          <td>Risk Report</td>
+          <td><code>orchestrator/agents/risk_report.py</code><br>
+              мини-Aladdin: <code>pnl_pct_depo</code>, MPP/MPU зоны, warning/stop флаги</td>
+          <td class="st-live">✅ Реализовано</td>
+        </tr>
+        <tr>
+          <td>Market Scanner</td>
+          <td><code>orchestrator/agents/market_scanner_bybit.py</code><br>
+              9-step pipeline: symbols → stats → range → NATR(14) → move_5m → top-N</td>
+          <td class="st-live">✅ Реализовано (live)</td>
+        </tr>
+        <tr>
+          <td>Bybit Client</td>
+          <td><code>orchestrator/agents/bybit_client.py</code><br>
+              Typed: <code>Stats24h</code>, <code>Kline</code> dataclasses · HMAC-SHA256 · read-only</td>
+          <td class="st-live">✅ Реализовано</td>
+        </tr>
+        <tr>
+          <td>API эндпоинты</td>
+          <td><code>/chat</code>, <code>/scan</code>, <code>/pnl</code>, <code>/positions</code>, <code>/journal</code>, <code>/health</code><br>
+              WebSocket: <code>/ws/chat</code> · стриминг токенов</td>
+          <td class="st-live">✅ Реализовано</td>
+        </tr>
+        <tr>
+          <td>Dashboard</td>
+          <td><code>dashboard.html</code> · real-time Bybit цены · TTM P&L · Scanner<br>
+              BTC/ETH/SOL/BNB/AVAX · позиции · журнал сделок</td>
+          <td class="st-live">✅ Реализовано</td>
+        </tr>
+        <tr>
+          <td>Конфигурация</td>
+          <td><code>orchestrator/config.py</code> · pydantic-settings · <code>.env</code><br>
+              Anthropic, TTM, Bybit ключи · TRADE_DEPOSIT · RISK_FAR_BELOW_MPP</td>
+          <td class="st-live">✅ Реализовано</td>
+        </tr>
+        <tr>
+          <td>Market Analyst</td>
+          <td><code>registry.py → _market_analyst()</code> · mock данные BTCUSDT<br>
+              Фаза 2: Bybit klines + ta-lib/pandas_ta</td>
+          <td class="st-mock">⏳ Mock (Фаза 2)</td>
+        </tr>
+        <tr>
+          <td>News Monitor</td>
+          <td><code>registry.py → _news_monitor()</code> · 3 фиктивных новости<br>
+              Фаза 2: CryptoCompare API + RSS парсер</td>
+          <td class="st-mock">⏳ Mock (Фаза 2)</td>
+        </tr>
+        <tr>
+          <td>Risk Guardian</td>
+          <td><code>registry.py → _risk_guardian()</code> · фиктивные метрики<br>
+              Фаза 3: интеграция с Bybit positions / wallet</td>
+          <td class="st-mock">⏳ Mock (Фаза 3)</td>
+        </tr>
+        <tr>
+          <td>Voice Agent (STT)</td>
+          <td>OpenAI Whisper · <code>settings.whisper_base_url</code></td>
+          <td class="st-plan">◦ Фаза 3</td>
+        </tr>
+        <tr>
+          <td>Voice Agent (TTS)</td>
+          <td>ElevenLabs API · <code>settings.elevenlabs_api_key</code></td>
+          <td class="st-plan">◦ Фаза 3</td>
+        </tr>
+        <tr>
+          <td>Память краткосрочная</td>
+          <td>Redis · <code>settings.redis_url</code> · conversation context</td>
+          <td class="st-plan">◦ Фаза 2</td>
+        </tr>
+        <tr>
+          <td>Память долгосрочная</td>
+          <td>pgvector / Chroma · <code>settings.chroma_host</code></td>
+          <td class="st-plan">◦ Фаза 4</td>
+        </tr>
+        <tr>
+          <td>Research Agent</td>
+          <td>Dune Analytics · Nansen · Arkham · web-поиск</td>
+          <td class="st-future">◦ Фаза 4</td>
+        </tr>
+        <tr>
+          <td>Деплой</td>
+          <td>Docker Compose · uvicorn</td>
+          <td class="st-plan">◦ Добавляется</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB: Phases                                                -->
+<!-- ══════════════════════════════════════════════════════════ -->
 <div class="section" id="tab-phases">
   <div class="card">
     <h2>⬡ Фазы реализации</h2>
     <div class="phases">
-      <div class="phase phase-1">
+
+      <div class="phase phase-done">
+        <span class="phase-status ps-done">✓ Выполнено</span>
         <div class="phase-num">Фаза 1 · MVP</div>
-        <h3>Ядро системы</h3>
+        <h3>Ядро + живые данные</h3>
         <ul>
-          <li>Orchestrator (FastAPI + claude-opus-4-6)</li>
-          <li>Trade Manager Agent + TTM API</li>
-          <li>Web Dashboard (базовый)</li>
-          <li>Chat UI + WebSocket</li>
-          <li>Docker Compose обновлён</li>
+          <li>Orchestrator FastAPI + claude-opus-4-6</li>
+          <li>Agentic loop: tool_use / end_turn</li>
+          <li>Trade Manager + TTM API (live)</li>
+          <li>Risk Report: MPP/MPU/zone/flags</li>
+          <li>Market Scanner + Bybit V5 REST (live)</li>
+          <li>NATR(14) Wilder RMA · asyncio.gather</li>
+          <li>Dashboard: real prices + P&L + Scanner</li>
+          <li>WebSocket стриминг токенов</li>
+          <li>REST: /scan /pnl /positions /journal</li>
         </ul>
       </div>
+
       <div class="phase phase-2">
+        <span class="phase-status ps-active">⏳ В работе</span>
         <div class="phase-num">Фаза 2 · Alpha</div>
-        <h3>Рыночные данные</h3>
+        <h3>Рыночные данные (реальные)</h3>
         <ul>
-          <li>Market Analyst Agent</li>
-          <li>News Monitor Agent</li>
-          <li>Live Binance/Bybit WS</li>
-          <li>Market Strip виджет</li>
-          <li>News Feed виджет</li>
+          <li>Market Analyst — реальные klines + TA</li>
+          <li>RSI / MACD / Bollinger Bands / VWAP</li>
+          <li>News Monitor — CryptoCompare + RSS</li>
+          <li>Sentiment классификатор</li>
+          <li>Redis — короткая память диалога</li>
+          <li>Мини-спарклайны для Dashboard</li>
         </ul>
       </div>
+
       <div class="phase phase-3">
+        <span class="phase-status ps-plan">◦ Планируется</span>
         <div class="phase-num">Фаза 3 · Beta</div>
-        <h3>Голос и риски</h3>
+        <h3>Голос и риск-интеграция</h3>
         <ul>
-          <li>Voice Agent (Whisper)</li>
-          <li>ElevenLabs TTS</li>
-          <li>Risk Guardian Agent</li>
-          <li>Risk Dashboard виджет</li>
+          <li>Voice Agent — Whisper STT</li>
+          <li>ElevenLabs TTS — голосовые брифинги</li>
+          <li>Risk Guardian — реальный Bybit positions</li>
+          <li>Drawdown лимиты · margin ratio live</li>
           <li>Telegram Bot интеграция</li>
+          <li>Push Alerts — уведомления</li>
         </ul>
       </div>
+
       <div class="phase phase-4">
+        <span class="phase-status ps-plan">◦ Планируется</span>
         <div class="phase-num">Фаза 4 · V1.0</div>
-        <h3>Расширенная память</h3>
+        <h3>Исследования и память</h3>
         <ul>
-          <li>Research Agent</li>
-          <li>pgvector / Chroma</li>
-          <li>On-chain данные</li>
-          <li>Продвинутая память</li>
-          <li>Push Notifications</li>
+          <li>Research Agent — Dune / Nansen</li>
+          <li>Web-поиск · PDF-анализ</li>
+          <li>pgvector / Chroma — долгая память</li>
+          <li>Docker Compose — полный деплой</li>
+          <li>Multi-exchange поддержка</li>
         </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB: Files                                                 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section" id="tab-files">
+  <div class="card">
+    <h2>⬡ Структура проекта</h2>
+    <div class="file-grid">
+      <div>
+        <div class="file-tree">
+<span class="dir">Office/</span>
+│
+├── <span class="html">dashboard.html</span>       <span class="note">← Trading Command Center UI</span>
+├── <span class="html">architecture.html</span>    <span class="note">← Эта страница</span>
+├── <span class="cfg">.env</span>                  <span class="note">← Ключи API (не в git)</span>
+│
+└── <span class="dir">orchestrator/</span>
+    ├── <span class="py">main.py</span>            <span class="note">← FastAPI app · порт 8002</span>
+    ├── <span class="py">config.py</span>          <span class="note">← pydantic-settings · .env</span>
+    ├── <span class="py">__init__.py</span>
+    │
+    ├── <span class="dir">api/</span>
+    │   ├── <span class="py">routes.py</span>      <span class="note">← /chat /scan /pnl /ws/chat</span>
+    │   └── <span class="py">__init__.py</span>
+    │
+    └── <span class="dir">agents/</span>
+        ├── <span class="py">registry.py</span>            <span class="note">← AGENT_TOOLS + dispatcher</span>
+        ├── <span class="py">ttm_client.py</span>          <span class="note">← TTM API v2 async client</span>
+        ├── <span class="py">risk_report.py</span>         <span class="note">← мини-Aladdin risk engine</span>
+        ├── <span class="py">bybit_client.py</span>        <span class="note">← Bybit V5 REST (read-only)</span>
+        ├── <span class="py">market_scanner_bybit.py</span> <span class="note">← Scanner: NATR · move_5m</span>
+        └── <span class="py">__init__.py</span></div>
+      </div>
+      <div>
+        <div class="file-tree">
+<span class="dir">Ключевые классы и функции</span>
+│
+├── <span class="py">bybit_client.py</span>
+│   ├── Stats24h           <span class="note">dataclass(slots=True)</span>
+│   ├── Kline              <span class="note">dataclass(slots=True)</span>
+│   ├── get_usdt_perp_symbols()
+│   ├── get_24h_stats()
+│   ├── get_klines()
+│   ├── get_wallet_balance()  <span class="note">HMAC</span>
+│   ├── get_positions()       <span class="note">HMAC</span>
+│   └── get_executions()      <span class="note">HMAC</span>
+│
+├── <span class="py">market_scanner_bybit.py</span>
+│   ├── ScanCandidate      <span class="note">dataclass + to_dict()</span>
+│   ├── _natr()            <span class="note">Wilder RMA</span>
+│   ├── _move_5m()         <span class="note">5 × 1m candles</span>
+│   └── scan_bybit_market()  <span class="note">9-step pipeline</span>
+│
+├── <span class="py">ttm_client.py</span>
+│   ├── get_me()
+│   ├── get_pnl(duration)
+│   ├── get_trades(duration, limit)
+│   ├── get_trades_range(from_ts, to_ts)
+│   └── get_open_positions()
+│
+└── <span class="py">risk_report.py</span>
+    └── build_risk_report()  <span class="note">async · day/week/custom</span>
+
+<span class="dir">REST API — /api/v1/</span>
+  POST /chat          <span class="note">← Claude agentic loop</span>
+  GET  /scan          <span class="note">← Bybit Scanner (direct)</span>
+  GET  /pnl           <span class="note">← TTM P&L (direct)</span>
+  GET  /positions     <span class="note">← TTM positions (direct)</span>
+  GET  /journal       <span class="note">← TTM trades (direct)</span>
+  GET  /health        <span class="note">← healthcheck</span>
+  WS   /ws/chat       <span class="note">← streaming tokens</span></div>
       </div>
     </div>
+  </div>
+
+  <div class="card">
+    <h2>⬡ Настройки (.env)</h2>
+    <table>
+      <thead><tr><th>Переменная</th><th>Назначение</th><th>По умолчанию</th></tr></thead>
+      <tbody>
+        <tr><td><code>ANTHROPIC_API_KEY</code></td><td>Ключ Claude API</td><td>обязателен</td></tr>
+        <tr><td><code>CLAUDE_MODEL</code></td><td>Модель оркестратора</td><td>claude-opus-4-6</td></tr>
+        <tr><td><code>TTM_API_KEY</code></td><td>TraderMake.Money</td><td>обязателен для Trade Manager</td></tr>
+        <tr><td><code>TTM_BASE_URL</code></td><td>Базовый URL TTM API</td><td>https://tradermake.money/api/v2</td></tr>
+        <tr><td><code>BYBIT_API_KEY</code></td><td>Bybit read-only ключ</td><td>обязателен для private методов</td></tr>
+        <tr><td><code>BYBIT_API_SECRET</code></td><td>Bybit HMAC secret</td><td>обязателен для private методов</td></tr>
+        <tr><td><code>BYBIT_BASE_URL</code></td><td>Bybit API base</td><td>https://api.bybit.com/v5</td></tr>
+        <tr><td><code>TRADE_DEPOSIT</code></td><td>Стартовый депозит для риск-расчётов ($)</td><td>1000.0</td></tr>
+        <tr><td><code>RISK_FAR_BELOW_MPP_THRESHOLD</code></td><td>Порог флага closed_far_below_mpp (%)</td><td>3.0</td></tr>
+        <tr><td><code>API_PORT</code></td><td>Порт FastAPI сервера</td><td>8002</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -431,29 +721,29 @@ graph TD
     startOnLoad: true,
     theme: 'dark',
     themeVariables: {
-      background: '#020617',
-      primaryColor: '#1a2740',
-      primaryTextColor: '#38bdf8',
+      background:         '#020617',
+      primaryColor:       '#1a2740',
+      primaryTextColor:   '#38bdf8',
       primaryBorderColor: '#38bdf8',
-      lineColor: '#334155',
-      secondaryColor: '#0d1f33',
-      tertiaryColor: '#0f2a1a',
-      edgeLabelBackground: '#020617',
-      clusterBkg: '#0a1628',
-      clusterBorder: '#334155',
-      titleColor: '#e5e7eb',
-      nodeBorder: '#334155',
-      mainBkg: '#1a2740',
+      lineColor:          '#334155',
+      secondaryColor:     '#0d1f33',
+      tertiaryColor:      '#0f2a1a',
+      edgeLabelBackground:'#020617',
+      clusterBkg:         '#0a1628',
+      clusterBorder:      '#334155',
+      titleColor:         '#e5e7eb',
+      nodeBorder:         '#334155',
+      mainBkg:            '#1a2740',
       fontFamily: 'system-ui, -apple-system, sans-serif',
     },
-    flowchart: { curve: 'basis', padding: 20 }
+    flowchart: { curve: 'basis', padding: 20 },
   });
 
-  function showTab(name) {
+  function showTab(ev, name) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
-    event.target.classList.add('active');
+    ev.currentTarget.classList.add('active');
   }
 </script>
 </body>

@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import uuid
 from typing import Any
 
 import anthropic
@@ -29,6 +30,48 @@ class ChatResponse(BaseModel):
     reply: str
     conversation_id: str
     tool_calls_made: list[str] = []
+
+
+@api_router.get("/scan")
+async def scan(
+    top_n:     int   = 8,
+    min_vol:   float = 30_000_000,
+    min_range: float = 3.0,
+) -> dict:
+    """
+    Прямой вызов Market Scanner (без Claude).
+    Используется дашбордом для виджета Bybit Scanner.
+    """
+    from orchestrator.agents.market_scanner_bybit import scan_bybit_market
+    return await scan_bybit_market(
+        min_quote_volume_24h=min_vol,
+        min_range_24h_pct=min_range,
+        min_move_5m_pct=0.0,
+        top_n=top_n,
+    )
+
+
+@api_router.get("/pnl")
+async def pnl(duration: str = "today") -> dict:
+    """P&L за период — прямой вызов TTM API (без Claude)."""
+    from orchestrator.agents.ttm_client import get_pnl as ttm_pnl
+    return await ttm_pnl(duration)
+
+
+@api_router.get("/positions")
+async def positions() -> dict:
+    """Открытые позиции — прямой вызов TTM API (без Claude)."""
+    from orchestrator.agents.ttm_client import get_open_positions
+    pos = await get_open_positions()
+    return {"positions": pos, "count": len(pos)}
+
+
+@api_router.get("/journal")
+async def journal(duration: str = "today", limit: int = 10) -> dict:
+    """Последние сделки за период — прямой вызов TTM API (без Claude)."""
+    from orchestrator.agents.ttm_client import get_trades as ttm_trades
+    trades = await ttm_trades(duration, limit=limit)
+    return {"trades": trades, "count": len(trades)}
 
 
 @api_router.get("/health")
@@ -84,7 +127,6 @@ async def chat(req: ChatRequest) -> ChatResponse:
     else:
         reply = "Агент завершил максимальное число итераций. Попробуйте уточнить запрос."
 
-    import uuid
     return ChatResponse(
         reply=reply,
         conversation_id=req.conversation_id or str(uuid.uuid4()),
@@ -140,18 +182,31 @@ def _build_system_prompt() -> str:
     return """Ты — главный агент виртуального офиса трейдера.
 Твоя задача:
 1. Разобрать намерение пользователя (торговый анализ, управление сделками, риск, новости, исследования).
-2. Вызвать нужный инструмент (субагент): market_analyst, news_monitor, trade_manager, risk_guardian, research_agent.
+2. Вызвать нужный инструмент (субагент).
 3. Синтезировать финальный ответ на русском языке, кратко и по существу.
 
-Правила:
-- Всегда отвечай на русском.
-- Для анализа рынка вызывай market_analyst.
+Правила маршрутизации:
+- Для анализа конкретного инструмента — market_analyst.
 - Для данных по сделкам (P&L, журнал) — trade_manager.
 - Для новостей и сентимента — news_monitor.
-- Для расчёта рисков — risk_guardian.
+- Для расчёта рисков позиции — risk_guardian.
 - Для on-chain и исследований — research_agent.
-- Не придумывай данные — используй инструменты.
-- Форматируй ответы чётко: цифры, уровни, выводы.
+- Для сканирования рынка Bybit (скальпинг, топ активов, что движется, лучшие пары) —
+  market_scanner с action='bybit_scan'.
+  Примеры фраз: "подбери монеты для скальпа", "топ активов Bybit по волатильности",
+  "что сейчас движется на Bybit", "покажи активные USDT-перпы".
+
+Правила ответа:
+- Всегда отвечай на русском.
+- Не придумывай данные — только инструменты.
+- Форматируй чётко: цифры, уровни, выводы.
+
+Формат ответа на результат market_scanner (action='bybit_scan'):
+Выведи нумерованный список тикеров. Для каждого — одна строка с метриками и краткий комментарий.
+Пример строки:
+  1. XYZUSDT — цена 0.0362, объём $202M, диапазон 43.2%, NATR(14)=1.6%, движение 5м: +1.3%
+     → Высокая волатильность, импульс вверх. Кандидат на лонг-скальп.
+Завершай ответ кратким общим выводом о состоянии рынка.
 """
 
 
