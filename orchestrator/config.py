@@ -44,5 +44,9 @@ class Settings(BaseSettings):
     # Параметр "далеко ниже MPP": насколько pnl_pct_depo отстаёт от mpp_pct_depo (в %)
     risk_far_below_mpp_threshold: float = 3.0
 
+    # History & Stats
+    # Путь к JSON-файлу накопленной статистики (относительно CWD или абсолютный)
+    stats_data_path: str = "data/stats.json"
+
 
 settings = Settings()

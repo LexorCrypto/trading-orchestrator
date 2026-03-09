@@ -189,6 +189,94 @@ AGENT_TOOLS: list[dict] = [
         },
     },
     {
+        "name": "daily_summarizer",
+        "description": (
+            "Строит дневные и недельные отчёты трейдера с LLM-уроками. "
+            "Дневной отчёт: P&L vs план, лучшая/худшая сделка, нарушения лимитов, уроки на завтра. "
+            "Недельный отчёт: P&L по дням, топ тикеры, паттерны нарушений, урок недели. "
+            "Вызывай при фразах: 'дневной отчёт', 'итоги дня', 'разбери мой день', "
+            "'недельный отчёт', 'итоги недели', 'что я сделал за неделю', "
+            "'дай уроки на завтра', 'weekly summary'."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": ["daily_report", "weekly_report"],
+                    "description": (
+                        "daily_report — отчёт за один день; "
+                        "weekly_report — отчёт за последние 5 торговых дней."
+                    ),
+                },
+                "date": {
+                    "type": "string",
+                    "description": (
+                        "Дата в формате YYYY-MM-DD для daily_report. "
+                        "По умолчанию — сегодня (UTC)."
+                    ),
+                },
+                "deposit": {
+                    "type": "number",
+                    "description": "Депозит в USD. По умолчанию из конфига (TRADE_DEPOSIT).",
+                },
+                "generate_lessons": {
+                    "type": "boolean",
+                    "description": "Генерировать уроки через LLM. По умолчанию true.",
+                },
+            },
+            "required": ["action"],
+        },
+    },
+    {
+        "name": "history_agent",
+        "description": (
+            "Агент истории и статистики торговли. "
+            "Накапливает данные из риск-отчётов, строит статистику по тикерам, "
+            "формирует зелёный/жёлтый/чёрный листы, показывает P&L по дням и нарушения лимитов. "
+            "Вызывай при фразах: 'статистика по тикерам', 'зелёный/жёлтый/чёрный лист', "
+            "'история P&L', 'нарушения лимитов', 'сохрани отчёт в историю', "
+            "'перестрой статистику из TTM', 'какие тикеры убыточные'."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": [
+                        "update",
+                        "get_ticker_stats",
+                        "get_ticker_lists",
+                        "get_pnl_history",
+                        "get_violations",
+                        "rebuild",
+                    ],
+                    "description": (
+                        "update — сохранить risk_report в историю; "
+                        "get_ticker_stats — агрегаты по символам; "
+                        "get_ticker_lists — зелёный/жёлтый/чёрный листы; "
+                        "get_pnl_history — P&L по дням; "
+                        "get_violations — нарушения лимитов; "
+                        "rebuild — перестроить статистику из TTM за N дней."
+                    ),
+                },
+                "risk_report": {
+                    "type": "object",
+                    "description": "Результат build_risk_report (для action='update').",
+                },
+                "days": {
+                    "type": "integer",
+                    "description": "Период в днях для фильтрации/запроса. None = всё время.",
+                },
+                "deposit": {
+                    "type": "number",
+                    "description": "Депозит для action='rebuild'. По умолч. из конфига.",
+                },
+            },
+            "required": ["action"],
+        },
+    },
+    {
         "name": "research_agent",
         "description": (
             "Исследует on-chain данные, DeFi протоколы, выполняет web-поиск, "
@@ -215,12 +303,14 @@ AGENT_TOOLS: list[dict] = [
 async def route_tool_call(name: str, input_data: dict[str, Any]) -> dict[str, Any]:
     """Маршрутизирует вызов инструмента к соответствующему субагенту."""
     handlers = {
-        "market_analyst": _market_analyst,
-        "news_monitor": _news_monitor,
-        "trade_manager": _trade_manager,
-        "risk_guardian": _risk_guardian,
-        "market_scanner": _market_scanner,
-        "research_agent": _research_agent,
+        "market_analyst":   _market_analyst,
+        "news_monitor":     _news_monitor,
+        "trade_manager":    _trade_manager,
+        "risk_guardian":    _risk_guardian,
+        "market_scanner":   _market_scanner,
+        "daily_summarizer": _daily_summarizer,
+        "history_agent":    _history_agent,
+        "research_agent":   _research_agent,
     }
     handler = handlers.get(name)
     if handler is None:
@@ -383,6 +473,18 @@ async def _market_scanner(inp: dict) -> dict:
         )
 
     return {"error": f"Unknown market_scanner action: {action}"}
+
+
+async def _daily_summarizer(inp: dict) -> dict:
+    """Daily Summarizer — дневные и недельные отчёты с LLM-уроками."""
+    from orchestrator.agents.daily_summarizer import handle_daily_summarizer
+    return await handle_daily_summarizer(inp)
+
+
+async def _history_agent(inp: dict) -> dict:
+    """History & Stats Agent — накопление статистики, тикер-листы, P&L-история."""
+    from orchestrator.agents.history_stats import handle_history_stats
+    return await handle_history_stats(inp)
 
 
 async def _research_agent(inp: dict) -> dict:
